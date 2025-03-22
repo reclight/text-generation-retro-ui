@@ -1,9 +1,18 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 
 export default function RetroChatbox() {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
+  const messagesEndRef = useRef(null);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
 
   const handleSend = async () => {
     if (input.trim()) {
@@ -62,27 +71,28 @@ export default function RetroChatbox() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen bg-black text-green-400 font-mono p-4">
-      <div className="w-full max-w-2xl border-green-500 border-2 bg-black shadow-lg p-6 retro-terminal">
-        <div className="h-[32rem] overflow-y-auto border-b-2 border-green-500 p-4 bg-black text-green-300 text-lg retro-scanlines">
+    <div className="flex flex-col items-center justify-center h-screen w-screen bg-black text-green-400 font-mono p-10">
+      <div className="w-full h-full max-w-[85%] max-h-[85%] border-green-500 border-2 bg-black shadow-lg p-8 retro-terminal flex flex-col">
+        <div className="flex-grow h-[75vh] overflow-y-auto border-b-2 border-green-500 p-8 bg-black text-green-300 text-lg retro-scanlines">
           {messages.map((msg, index) => (
             <motion.div 
               key={index} 
               initial={{ opacity: 0 }} 
               animate={{ opacity: 1 }} 
               transition={{ duration: 0.3 }}
-              className="mb-4"
+              className="mb-6"
             >
               <span className={msg.type === "user" ? "text-green-200" : "text-green-500"}>
                 {msg.text}
               </span>
             </motion.div>
           ))}
+          <div ref={messagesEndRef} />
         </div>
-        <div className="flex mt-4">
-          <span className="text-green-500 text-lg">> </span>
+        <div className="flex p-2 border-t-2 border-green-500 bg-black">
+          <span className="text-green-500 text-lg"> </span>
           <input 
-            className="flex-1 bg-black border-none text-green-400 placeholder-green-600 focus:ring-0 focus:outline-none p-3 font-mono text-lg retro-input" 
+            className="flex-1 bg-black border-none text-green-400 placeholder-green-600 focus:ring-0 focus:outline-none p-5 font-mono text-lg retro-input" 
             placeholder="Type a command..." 
             value={input} 
             onChange={(e) => setInput(e.target.value)}
